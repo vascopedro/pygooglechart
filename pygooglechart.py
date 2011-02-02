@@ -293,15 +293,17 @@ class Chart(object):
     LINEAR_GRADIENT = 'lg'
     LINEAR_STRIPES = 'ls'
 
-    def __init__(self, width, height, title=None, legend=None, colours=None,
+    def __init__(self, width=None, height=None, title=None, legend=None, colours=None,
             auto_scale=True, x_range=None, y_range=None,
             colours_within_series=None):
         if type(self) == Chart:
             raise AbstractClassException('This is an abstract class')
-        assert(isinstance(width, int))
-        assert(isinstance(height, int))
-        self.width = width
+        if width:
+            assert(isinstance(width, int))
+        if height:
+            assert(isinstance(height, int))
         self.height = height
+        self.width = width
         self.data = []
         self.set_title(title)
         self.set_title_style(None, None)
@@ -349,7 +351,8 @@ class Chart(object):
         url_bits = []
         # required arguments
         url_bits.append(self.type_to_url())
-        url_bits.append('chs=%ix%i' % (self.width, self.height))
+        if self.width and self.height:
+            url_bits.append('chs=%ix%i' % (self.width, self.height))
         url_bits.append(self.data_to_url(data_class=data_class))
         # optional arguments
         if self.title:
@@ -390,6 +393,7 @@ class Chart(object):
     # -------------------------------------------------------------------------
 
     def download(self, file_name, use_post=True):
+        
         if use_post:
             opener = urllib2.urlopen(self.BASE_URL, self.get_url_extension())
         else:
@@ -936,6 +940,21 @@ class PieChart3D(PieChart):
 
     def type_to_url(self):
         return 'cht=p3'
+
+
+class TexFormula(Chart):
+    
+    def __init__(self, *args, **kwargs):
+        Chart.__init__(self, *args, **kwargs)
+        self.formula = None
+    
+    def type_to_url(self):
+        return 'cht=tx'
+    
+    def get_url_bits(self, data_class=None):
+        url_bits = Chart.get_url_bits(self, data_class=data_class)
+        url_bits.append('chl=%s' % self.formula)
+        return url_bits
 
 
 class VennChart(Chart):

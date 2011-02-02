@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-width = 250
-height = 100
+width = 600
+height = 200
 
